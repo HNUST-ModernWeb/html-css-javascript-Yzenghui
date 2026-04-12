@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>个人信息卡片 | 高级Web课程作业</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        :root {
+            --bg-gradient-start: #e0eafc;
+            --bg-gradient-end: #cfdef3;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+            --input-focus: #3b82f6;
+            --btn-primary: #3b82f6;
+            --btn-primary-hover: #2563eb;
+            --btn-text: #ffffff;
+            --shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark {
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-end: #1e293b;
+            --card-bg: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+            --input-bg: #0f172a;
+            --input-border: #475569;
+            --input-focus: #60a5fa;
+            --btn-primary: #3b82f6;
+            --btn-primary-hover: #60a5fa;
+            --shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1.5rem;
+            margin: 0;
+        }
+
+        /* 卡片容器 - 居中、阴影、圆角 */
+        .card {
+            max-width: 600px;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-radius: 2rem;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            backdrop-filter: blur(0px);
+        }
+
+        .card-inner {
+            padding: 2rem;
+        }
+
+        /* 标题 */
+        .page-title {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.8rem;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        /* 头像区域 */
+        .avatar-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1.8rem;
+        }
+
+        .avatar-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--card-bg);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+            background-color: #cbd5e1;
+            transition: transform 0.2s;
+        }
+
+        .avatar-img:hover {
+            transform: scale(1.02);
+        }
+
+        .upload-label {
+            margin-top: 0.75rem;
+            background-color: var(--btn-primary);
+            color: white;
+            font-size: 0.8rem;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .upload-label:hover {
+            background-color: var(--btn-primary-hover);
+        }
+
+        #avatarUpload {
+            display: none;
+        }
+
+        /* 展示区 - 保存后显示的内容 */
+        .display-area {
+            text-align: center;
+            margin-bottom: 1.8rem;
+            padding: 0.8rem;
+            border-radius: 1.5rem;
+            background: rgba(0,0,0,0.02);
+        }
+
+        #displayName {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            word-break: break-word;
+        }
+
+        #displayBio {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* 编辑区 - 输入框和保存按钮 */
+        .edit-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .input-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .input-group input,
+        .input-group textarea {
+            background-color: var(--input-bg);
+            border: 1.5px solid var(--input-border);
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .save-btn {
+            background: var(--btn-primary);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.8rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--btn-text);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        .save-btn:hover {
+            background-color: var(--btn-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(59,130,246,0.3);
+        }
+
+        .save-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* 顶部工具栏 - 主题切换 */
+        .card-header {
+            display: flex;
+            justify-content: flex-end;
+            padding: 1rem 1.8rem 0;
+        }
+
+        .theme-toggle {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 40px;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--btn-primary);
+            color: white;
+            border-color: var(--btn-primary);
+        }
+
+        /* Toast 提示 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: #10b981;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        hr {
+            margin: 0.5rem 0 1rem;
+            border-color: var(--border-color);
+        }
+
+        @media (max-width: 500px) {
+            .card-inner {
+                padding: 1.5rem;
+            }
+            .avatar-img {
+                width: 100px;
+                height: 100px;
+            }
+            #displayName {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    
+<div class="card">
+    <div class="card-header">
+        <button class="theme-toggle" id="themeToggleBtn">暗色模式</button>
+    </div>
+
+    <div class="card-inner">
+        <h1 class="page-title">个人信息卡片</h1>
+
+        <!-- 头像部分：默认纯色占位图，支持用户上传 -->
+        <div class="avatar-section">
+            <img id="avatarImg" class="avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%233b82f6' /%3E%3Ccircle cx='50' cy='38' r='12' fill='%23ffffff' /%3E%3Cpath fill='%23ffffff' d='M20,70 Q50,88 80,70 L78,73 Q50,92 22,73 Z' /%3E%3C/svg%3E" alt="头像">
+            <label for="avatarUpload" class="upload-label">更换头像</label>
+            <input type="file" id="avatarUpload" accept="image/jpeg, image/png, image/webp, image/gif">
+        </div>
+
+        <!-- 展示区：保存后显示的内容 -->
+        <div class="display-area">
+            <div id="displayName"></div>
+            <div id="displayBio"></div>
+        </div>
+
+        <!-- 编辑区：姓名输入框、简介文本框、保存按钮 -->
+        <div class="edit-area">
+
+            <div class="input-group">
+                <label>姓名</label>
+                <input type="text" id="editName" placeholder="请输入姓名" autocomplete="off">
+            </div>
+
+            <div class="input-group">
+                <label>个人简介</label>
+                <textarea id="editBio" placeholder="介绍一下自己..."></textarea>
+            </div>
+
+            <button class="save-btn" id="saveBtn">保存</button>
+            
+        </div>
+    </div>
+</div>
+
+<div id="toastMsg" class="toast">保存成功</div>
+
+<script>
+    // 获取DOM元素
+    const avatarImg = document.getElementById('avatarImg');
+    const avatarUpload = document.getElementById('avatarUpload');
+    const displayNameSpan = document.getElementById('displayName');
+    const displayBioDiv = document.getElementById('displayBio');
+    const editNameInput = document.getElementById('editName');
+    const editBioTextarea = document.getElementById('editBio');
+    const saveBtn = document.getElementById('saveBtn');
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const toastEl = document.getElementById('toastMsg');
+
+    // 默认数据
+    const DEFAULT_NAME = "袁增辉";
+    const DEFAULT_BIO = "全栈开发 | 热爱学习新技术";
+
+    // 显示toast提示，1.5秒后自动隐藏
+    function showToast(message) {
+        toastEl.textContent = message || "保存成功";
+        toastEl.classList.add('show');
+        setTimeout(() => {
+            toastEl.classList.remove('show');
+        }, 1500);
+    }
+
+    // 更新展示区内容，同时保存到localStorage
+    function updateDisplay() {
+        let newName = editNameInput.value.trim();
+        let newBio = editBioTextarea.value.trim();
+
+        if (newName === "") {
+            newName = "未填写姓名";
+        }
+        if (newBio === "") {
+            newBio = "暂无简介";
+        }
+
+        displayNameSpan.textContent = newName;
+        displayBioDiv.textContent = newBio;
+
+        // 同步更新编辑区的内容
+        editNameInput.value = newName;
+        editBioTextarea.value = newBio;
+
+        // 保存到localStorage
+        localStorage.setItem('profileName', newName);
+        localStorage.setItem('profileBio', newBio);
+
+        showToast("保存成功");
+    }
+
+    // 保存按钮点击事件
+    function handleSave() {
+        updateDisplay();
+    }
+
+    // 头像上传：选择图片后实时更新
+    function handleAvatarUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        if (!allowedTypes.includes(file.type)) {
+            showToast("仅支持 JPG/PNG/WEBP/GIF 格式");
+            avatarUpload.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            avatarImg.src = e.target.result;
+            showToast("头像已更换");
+        };
+        reader.onerror = function() {
+            showToast("图片读取失败");
+            avatarUpload.value = '';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // 主题切换：暗色/亮色模式，保存偏好
+    let isDark = false;
+    function applyTheme() {
+        const body = document.body;
+        if (isDark) {
+            body.classList.add('dark');
+            themeToggleBtn.textContent = "亮色模式";
+        } else {
+            body.classList.remove('dark');
+            themeToggleBtn.textContent = "暗色模式";
+        }
+        localStorage.setItem('themePref', isDark ? 'dark' : 'light');
+    }
+
+    function toggleTheme() {
+        isDark = !isDark;
+        applyTheme();
+        showToast(isDark ? "已切换至暗色模式" : "已切换至亮色模式");
+    }
+
+    // 加载本地存储的数据（姓名、简介、主题偏好）
+    function loadStoredData() {
+        const savedName = localStorage.getItem('profileName');
+        const savedBio = localStorage.getItem('profileBio');
+        if (savedName !== null) {
+            displayNameSpan.textContent = savedName;
+            editNameInput.value = savedName;
+        } else {
+            displayNameSpan.textContent = DEFAULT_NAME;
+            editNameInput.value = DEFAULT_NAME;
+        }
+        if (savedBio !== null) {
+            displayBioDiv.textContent = savedBio;
+            editBioTextarea.value = savedBio;
+        } else {
+            displayBioDiv.textContent = DEFAULT_BIO;
+            editBioTextarea.value = DEFAULT_BIO;
+        }
+
+        const savedTheme = localStorage.getItem('themePref');
+        if (savedTheme === 'dark') {
+            isDark = true;
+        } else {
+            isDark = false;
+        }
+        applyTheme();
+    }
+
+    // 初始化事件绑定
+    function bindEvents() {
+        saveBtn.addEventListener('click', handleSave);
+        avatarUpload.addEventListener('change', handleAvatarUpload);
+        themeToggleBtn.addEventListener('click', toggleTheme);
+        // 按回车保存（仅对姓名输入框）
+        editNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSave();
+            }
+        });
+    }
+
+    // 初始化页面
+    function init() {
+        loadStoredData();
+        bindEvents();
+    }
+
+    init();
+</script>
+
+</body>
+
+</html>
